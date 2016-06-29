@@ -8,9 +8,14 @@
 
 import UIKit
 
-class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
 
     var tweets: [Tweet]!
+    
+    var tweetCount = 20
+    
+    var isMoreDataLoading = false
+    
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -23,12 +28,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.rowHeight = UITableViewAutomaticDimension;
         tableView.estimatedRowHeight = 100.0;
         
-        TwitterClient.sharedInstance.homeTimeline({ (tweets: [Tweet]) in
-            self.tweets = tweets
-            self.tableView.reloadData()
-        }) { (error: NSError) in
-            print("error: \(error.localizedDescription)")
-        }
+        retrieveTimeline()
         
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), forControlEvents: UIControlEvents.ValueChanged)
@@ -43,39 +43,40 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         // Dispose of any resources that can be recreated.
     }
     
+    func retrieveTimeline(){
+        TwitterClient.sharedInstance.homeTimeline(tweetCount, success: { (tweets: [Tweet]) in
+            self.tweets = tweets
+            self.tableView.reloadData()
+        }) { (error: NSError) in
+            print("error: \(error.localizedDescription)")
+        }
+    }
+    
     // Makes a network request to get updated data
     // Updates the tableView with the new data
     // Hides the RefreshControl
     func refreshControlAction(refreshControl: UIRefreshControl) {
-        
-        TwitterClient.sharedInstance.homeTimeline({ (tweets: [Tweet]) in
-            self.tweets = tweets
-            self.tableView.reloadData()
-            refreshControl.endRefreshing()
-        }) { (error: NSError) in
-            print("error: \(error.localizedDescription)")
+        tweetCount = 20
+        retrieveTimeline()
+        refreshControl.endRefreshing()
+    }
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if (!isMoreDataLoading) {
+            // Calculate the position of one screen length before the bottom of the results
+            let scrollViewContentHeight = tableView.contentSize.height
+            let scrollOffsetThreshold = scrollViewContentHeight - tableView.bounds.size.height
+            
+            // When the user has scrolled past the threshold, start requesting
+            if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.dragging) {
+                isMoreDataLoading = true
+                
+                // ... Code to load more results ...
+                tweetCount += 20
+                retrieveTimeline()
+                isMoreDataLoading = false
+            }
         }
-        
-//        // ... Create the NSURLRequest (myRequest) ...
-//        
-//        // Configure session so that completion handler is executed on main UI thread
-//        let session = NSURLSession(
-//            configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
-//            delegate:nil,
-//            delegateQueue:NSOperationQueue.mainQueue()
-//        )
-//        
-//        let task : NSURLSessionDataTask = session.dataTaskWithRequest(myRequest, completionHandler: { (data, response, error) in
-//                                                                        
-//            // ... Use the new data to update the data source ...
-//                                                                        
-//            // Reload the tableView now that there is new data
-//            self.myTableView.reloadData()
-//                                                                        
-//            // Tell the refreshControl to stop spinning
-//            refreshControl.endRefreshing()
-//        });
-//        task.resume()
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -90,6 +91,20 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cell = tableView.dequeueReusableCellWithIdentifier("TweetCell", forIndexPath: indexPath) as! TweetCell
         cell.tweet = tweets[indexPath.row]
         return cell
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if (segue.identifier == "homeToDetailSegue") {
+            let destinationVC = segue.destinationViewController as! TweetDetailViewController
+            let indexPath = tableView.indexPathForSelectedRow
+            let tweet = tweets[indexPath!.row]
+            destinationVC.tweet = tweet
+            self.tableView.deselectRowAtIndexPath(indexPath!, animated: true)
+        }
+    }
+    
+    @IBAction func onComposeTweet(sender: AnyObject) {
+        self.performSegueWithIdentifier("homeToComposeSegue", sender: nil)
     }
     
     /*

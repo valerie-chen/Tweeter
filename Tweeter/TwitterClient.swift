@@ -60,8 +60,8 @@ class TwitterClient: BDBOAuth1SessionManager {
         }
     }
     
-    func homeTimeline(success: ([Tweet]) -> (), failure: (NSError) -> ()) {
-        GET("1.1/statuses/home_timeline.json", parameters: nil, progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
+    func homeTimeline(count: Int, success: ([Tweet]) -> (), failure: (NSError) -> ()) {
+        GET("1.1/statuses/home_timeline.json", parameters: ["count": count], progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
             
             let dictionaries = response as! [NSDictionary]
             let tweets = Tweet.tweetsWithArray(dictionaries)
@@ -84,7 +84,47 @@ class TwitterClient: BDBOAuth1SessionManager {
             }, failure: { (task: NSURLSessionDataTask?, error: NSError) in
                 failure(error)
         })
-
+    }
+    
+    func postTweet(postText: NSString, success: () -> (), failure: (NSError) -> ()){
+        POST("1.1/statuses/update.json", parameters: ["status": postText], progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
+            success()
+        }) { (task: NSURLSessionDataTask?, error: NSError) in
+                failure(error)
+        }
+    }
+    
+    func likePost(postId: NSString, success: () -> (), failure: (NSError) -> ()) {
+        POST("1.1/favorites/create.json?id=\(String(postId))", parameters: nil, progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
+            success()
+        }) { (task: NSURLSessionDataTask?, error: NSError) in
+                failure(error)
+        }
+    }
+    
+    func unlikePost(postId: NSString, success: () -> (), failure: (NSError) -> ()) {
+        POST("1.1/favorites/destroy.json?id=\(String(postId))", parameters: nil, progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
+            success()
+        }) { (task: NSURLSessionDataTask?, error: NSError) in
+            failure(error)
+        }
+    }
+    
+    func retweetPost(postId: NSString, success: () -> (), failure: (NSError) -> ()) {
+        POST("1.1/statuses/retweet/\(postId).json"
+            , parameters: nil, progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
+    success()
+        }) { (task: NSURLSessionDataTask?, error: NSError) in
+                failure(error)
+        }
+    }
+    
+    func unretweetPost(postId: NSString, success: () -> (), failure: (NSError) -> ()) {
+        POST("1.1/statuses/unretweet/\(postId).json", parameters: nil, progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
+            success()
+        }) { (task: NSURLSessionDataTask?, error: NSError) in
+                failure(error)
+        }
     }
     
 }
