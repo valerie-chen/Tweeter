@@ -21,8 +21,8 @@ The following **required** functionality is completed:
    - [ ] Contains the user header view: picture and tagline
    - [ ] Contains a section with the users basic stats: # tweets, # following, # followers
    - [ ] Profile view should include that user's timeline
-- [ ] User can navigate to view their own profile
-   - [ ] Contains the user header view: picture and tagline
+- [X] User can navigate to view their own profile
+   - [X] Contains the user header view: picture and tagline
    - [ ] Contains a section with the users basic stats: # tweets, # following, # followers
 
 The following **optional** features are implemented:
@@ -62,6 +62,7 @@ Describe any challenges encountered while building the app.
 List an 3rd party libraries, icons, graphics, or other assets you used in your app.
 
 - [AFNetworking](https://github.com/AFNetworking/AFNetworking) - networking task library
+- DateTools
 
 ## License
 
