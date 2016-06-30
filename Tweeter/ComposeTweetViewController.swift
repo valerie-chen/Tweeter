@@ -12,9 +12,26 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
 
     @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var tweetTextView: UITextView!
+    @IBOutlet weak var optionsView: UIView!
+    @IBOutlet weak var inReplyLabel: UILabel!
+    @IBOutlet weak var charactersLeftLabel: UILabel!
+    
+    let maxCharacters: Int = 140
+    
+    @IBOutlet weak var optionsViewToBottomConstraint: NSLayoutConstraint!
     
     var user: User = User.currentUser!
     var defaultText = "What's happening?" as String
+    
+    var keyboardHeight: CGFloat? = 0.0
+    
+    var inReplyTo: Tweet?
+    var replyScreenName: String?
+    var isReply: Bool = false
+    
+    var replyDefaultHeight: CGFloat = 0.0
+    
+    var inReplyText = "↓ In reply to "
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +39,7 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
         tweetTextView.delegate = self
         tweetTextView.text = defaultText
         tweetTextView.textColor = UIColor.lightGrayColor()
+        tweetTextView.keyboardType = UIKeyboardType.Twitter
         
         if user.defaultProfileImage! {
             profileImageView.image = UIImage(imageLiteral: "defaultEgg.png")
@@ -32,11 +50,34 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
         profileImageView.layer.cornerRadius = profileImageView.frame.size.width / 10
         profileImageView.clipsToBounds = true
         
-
-        // Do any additional setup after loading the view.
+        replyDefaultHeight = inReplyLabel.frame.size.height
+        
+        if (inReplyTo != nil){
+            isReply = true
+            replyScreenName = inReplyTo!.user!.screenName!
+            inReplyLabel.text = inReplyText + replyScreenName!
+            tweetTextView.text = "@\(replyScreenName!)" + " "
+            tweetTextView.textColor = UIColor.blackColor()
+        } else {
+            inReplyLabel.frame.size.height = 0
+            inReplyLabel.text = ""
+        }
+        
+        checkReply()
+        
+        if (isReply) {
+            print("reply\n")
+            checkCharacters()
+        } else {
+            print("not a reply\n")
+        }
+        
     }
     
     func textViewDidBeginEditing(textView: UITextView) {
+//        print("\(String(keyboardHeight!))")
+//        optionsViewToBottomConstraint.constant = keyboardHeight!
+        // optionsView.transform = CGAffineTransformMakeTranslation( 0.0, -1 * keyboardHeight!)
         if (textView.text == defaultText){
             textView.text = ""
             textView.textColor = UIColor.blackColor()
@@ -51,22 +92,86 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
         }
         textView.resignFirstResponder()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func textViewDidChange(textView: UITextView) {
+        let fixedWidth = textView.frame.size.width
+        textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.max))
+        let newSize = textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.max))
+        var newFrame = textView.frame
+        newFrame.size = CGSize(width: max(newSize.width, fixedWidth), height: newSize.height)
+        textView.frame = newFrame;
+        checkReply()
+        checkCharacters()
     }
+    
+    func checkReply() {
+        if (replyScreenName != nil){
+            if tweetTextView.text.rangeOfString("@\(replyScreenName!)") == nil{
+                inReplyLabel.frame.size.height = 0
+                inReplyLabel.text = ""
+                isReply = false
+            } else {
+                inReplyLabel.frame.size.height = replyDefaultHeight
+                inReplyLabel.text = inReplyText + replyScreenName!
+                isReply = true
+            }
+        } else {
+            isReply = false
+        }
+    }
+    
+    func checkCharacters() {
+        let charactersLeft = maxCharacters - tweetTextView.text.characters.count
+        charactersLeftLabel.text = String(charactersLeft)
+        if (charactersLeft > 0){
+            charactersLeftLabel.textColor = UIColor.lightGrayColor()
+        } else {
+            charactersLeftLabel.textColor = UIColor.redColor()
+        }
+    }
+    
+//    func keyboardShown(notification: NSNotification) {
+//        let info  = notification.userInfo!
+//        let value: AnyObject = info[UIKeyboardFrameEndUserInfoKey]!
+//        
+//        let rawFrame = value.CGRectValue
+//        let keyboardFrame = view.convertRect(rawFrame, fromView: nil)
+//        
+//        keyboardHeight = keyboardFrame.size.height
+//        print("reached")
+//    }
     
     @IBAction func onTweet(sender: AnyObject) {
         if (tweetTextView.text != "") {
-            TwitterClient.sharedInstance.postTweet(tweetTextView.text, success: {
-                self.dismissViewControllerAnimated(true, completion: {
-                    
+            let client = TwitterClient.sharedInstance
+            if (isReply) {
+                client.postReplyTweet(tweetTextView.text, inReplyToString: inReplyTo!.id!, success: {
+                    self.dismissViewControllerAnimated(true, completion: {
+                        
+                    })
+                    }, failure: { (error: NSError) in
+                        print("error: \(error.localizedDescription)")
                 })
-                }, failure: { (error: NSError) in
-                    print("error: \(error.localizedDescription)")
-            })
+            } else {
+                client.postTweet(tweetTextView.text, success: {
+                    self.dismissViewControllerAnimated(true, completion: {
+                        
+                    })
+                    }, failure: { (error: NSError) in
+                        print("error: \(error.localizedDescription)")
+                })
+            }
         }
+    }
+    
+    @IBAction func onCancel(sender: AnyObject) {
+        self.dismissViewControllerAnimated(true) {
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
 
     /*

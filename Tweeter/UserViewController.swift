@@ -8,7 +8,7 @@
 
 import UIKit
 
-class UserViewController: UIViewController {
+class UserViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var backgroundImageView: UIImageView!
@@ -19,7 +19,13 @@ class UserViewController: UIViewController {
     @IBOutlet weak var followingCountLabel: UILabel!
     @IBOutlet weak var followersCountLabel: UILabel!
     
+    @IBOutlet weak var tableView: UITableView!
+    
     var user: User?
+    
+    var tweets: [Tweet]!
+    
+    var tweetCount: Int = 20
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,7 +64,38 @@ class UserViewController: UIViewController {
         followingCountLabel.sizeToFit()
         followersCountLabel.sizeToFit()
         
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        tableView.rowHeight = UITableViewAutomaticDimension;
+        tableView.estimatedRowHeight = 100.0;
+        
+        retrieveTimeline()
+        
         // Do any additional setup after loading the view.
+    }
+    
+    func retrieveTimeline(){
+        TwitterClient.sharedInstance.userTimeline(user!.screenName!, success: { (tweets: [Tweet]) in
+            self.tweets = tweets
+            self.tableView.reloadData()
+        }) { (error: NSError) in
+            print("error: \(error.localizedDescription)")
+        }
+    }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if tweets != nil { // could this cause any problems?
+            return tweets.count
+        } else {
+            return 0
+        }
+    }
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("TweetCell", forIndexPath: indexPath) as! TweetCell
+        cell.tweet = tweets[indexPath.row]
+        return cell
     }
 
     override func didReceiveMemoryWarning() {

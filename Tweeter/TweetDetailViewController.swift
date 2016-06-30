@@ -88,7 +88,7 @@ class TweetDetailViewController: UIViewController {
     }
     
     @IBAction func onReplyButton(sender: AnyObject) {
-        
+        performSegueWithIdentifier("detailReplyToComposeSegue", sender: nil)
     }
     
     @IBAction func onRetweetButton(sender: AnyObject) {
@@ -127,6 +127,9 @@ class TweetDetailViewController: UIViewController {
         if (segue.identifier == "tweetDetailToUserSegue"){
             let destinationVC = segue.destinationViewController as! UserViewController
             destinationVC.user = tweet.user
+        } else if (segue.identifier == "detailReplyToComposeSegue"){
+            let destinationVC = segue.destinationViewController as! ComposeTweetViewController
+            destinationVC.inReplyTo = tweet
         }
     }
 

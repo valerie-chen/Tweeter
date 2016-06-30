@@ -65,6 +65,10 @@ class MeViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
 
+    @IBAction func onComposeTweet(sender: AnyObject) {
+        self.performSegueWithIdentifier("meToComposeSegue", sender: nil)
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

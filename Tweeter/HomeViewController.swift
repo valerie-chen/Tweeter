@@ -100,6 +100,13 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             let tweet = tweets[indexPath!.row]
             destinationVC.tweet = tweet
             self.tableView.deselectRowAtIndexPath(indexPath!, animated: true)
+        } else if (segue.identifier == "homeReplyToComposeSegue") {
+            let cell = sender?.superview!!.superview as! TweetCell
+            let myTableView = cell.superview!.superview as! UITableView
+            let indexPath = myTableView.indexPathForCell(cell)
+            let tweet = tweets[indexPath!.row]
+            let destinationVC = segue.destinationViewController as! ComposeTweetViewController
+            destinationVC.inReplyTo = tweet
         }
     }
     
