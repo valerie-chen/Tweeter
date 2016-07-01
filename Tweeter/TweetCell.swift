@@ -24,51 +24,94 @@ class TweetCell: UITableViewCell {
     @IBOutlet weak var retweetCountLabel: UILabel!
     @IBOutlet weak var likeCountLabel: UILabel!
     
+    @IBOutlet weak var retweetedView: UIImageView!
+    @IBOutlet weak var retweetedLabel: UILabel!
+    
+    var retweetedOf: NSDictionary?
+    
+    @IBOutlet weak var retweetedLabelHeight: NSLayoutConstraint!
+    @IBOutlet weak var retweetedViewHeight: NSLayoutConstraint!
+    
+    @IBOutlet weak var nameLabelTop: NSLayoutConstraint!
+    
     let client = TwitterClient.sharedInstance
     
     var tweet: Tweet! {
         didSet {
-            let user = tweet.user!
-            
-            nameLabel.text = user.name
-            nameLabel.sizeToFit()
-            
-            screenNameLabel.text = "@" + user.screenName!
-            screenNameLabel.sizeToFit()
-            
-            postTextLabel.text = tweet.text 
-            postTextLabel.sizeToFit()
-            
-            // favorited = tweet.favorited
-            if tweet.favorited {
-                likeOn()
+            retweetedOf = tweet.retweetedTweet
+            if retweetedOf == nil {
+                formatCell(tweet)
+                profileImageView.frame = CGRectMake(profileImageView.frame.origin.x, profileImageView.frame.origin.y - 8, profileImageView.frame.width, profileImageView.frame.height)
+                retweetedLabel.hidden = true
+                retweetedView.hidden = true
+//                retweetedLabelHeight = NSLayoutConstraint(item: retweetedLabel, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 0.0)
+//                retweetedViewHeight = NSLayoutConstraint(item: retweetedView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 0.0)
+//                
+//                NSLayoutConstraint.activateConstraints([retweetedLabelHeight!, retweetedViewHeight!])
+//                retweetedView.frame.size = CGSize(width: 0.0, height: 0.0)
+//                retweetedLabel.frame.size = CGSize(width: 0.0, height: 0.0)
+//                print(String(retweetedView.frame.height))
+//                retweetedViewHeight.active = false
+//                retweetedView.translatesAutoresizingMaskIntoConstraints = true
+//                retweetedLabel.translatesAutoresizingMaskIntoConstraints = true
+//                retweetedView.frame = CGRectMake(retweetedView.frame.origin.x, retweetedView.frame.origin.y, /*retweetedView.frame.width*/ 0.0, 0.0)
+//                retweetedLabel.frame = CGRectMake(retweetedLabel.frame.origin.x, retweetedLabel.frame.origin.y, /*retweetedLabel.frame.width*/ 0.0, 0.0)
+                
             } else {
-                likeOff()
+                
+                let newTweet = Tweet(dictionary: retweetedOf!)
+                formatCell(newTweet)
+//                retweetedViewHeight.active = true
+//                retweetedLabel.text = "\(tweet!.user!.name!) Retweeted"
+//                retweetedLabelHeight = NSLayoutConstraint(item: retweetedLabel, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 15.5)
+//                retweetedViewHeight = NSLayoutConstraint(item: retweetedView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 15.5)
+//                
+//                NSLayoutConstraint.activateConstraints([retweetedLabelHeight!, retweetedViewHeight!])
             }
-            
-            if tweet.retweeted {
-                retweetView.image = UIImage(named: "retweet-action-green")
-                let retweetColor = UIColor(red:0.10, green:0.81, blue:0.53, alpha:1.0)
-                retweetCountLabel.textColor = retweetColor
-            } else {
-                retweetView.image = UIImage(named: "retweet-action")
-                let retweetColor = UIColor(red:0.67, green:0.72, blue:0.76, alpha:1.0)
-                retweetCountLabel.textColor = retweetColor
-            }
-            
-            let imageUrl = user.profileUrl
-            profileImageView.setImageWithURL(imageUrl!)
-            profileImageView.layer.cornerRadius = profileImageView.frame.size.width / 10
-            profileImageView.clipsToBounds = true
-
-            
-            let postDate = tweet.timeStamp
-            let timeAgoDate = NSDate.shortTimeAgoSinceDate(postDate)
-            timeStampLabel.text = timeAgoDate
-            
-            retweetCountLabel.text = String(tweet.retweetCount)
-            likeCountLabel.text = String(tweet.favoritesCount)
         }
+    }
+    
+    func formatCell(tweet: Tweet) {
+        let user = tweet.user!
+        
+        nameLabel.text = user.name
+        nameLabel.sizeToFit()
+        
+        screenNameLabel.text = "@" + user.screenName!
+        screenNameLabel.sizeToFit()
+        
+        postTextLabel.text = tweet.text
+        postTextLabel.sizeToFit()
+        
+        // favorited = tweet.favorited
+        if tweet.favorited {
+            likeOn()
+        } else {
+            likeOff()
+        }
+        
+        if tweet.retweeted {
+            retweetView.image = UIImage(named: "retweet-action-green")
+            let retweetColor = UIColor(red:0.10, green:0.81, blue:0.53, alpha:1.0)
+            retweetCountLabel.textColor = retweetColor
+        } else {
+            retweetView.image = UIImage(named: "retweet-action")
+            let retweetColor = UIColor(red:0.67, green:0.72, blue:0.76, alpha:1.0)
+            retweetCountLabel.textColor = retweetColor
+        }
+        
+        let imageUrl = user.profileUrl
+        profileImageView.setImageWithURL(imageUrl!)
+        profileImageView.layer.cornerRadius = profileImageView.frame.size.width / 10
+        profileImageView.clipsToBounds = true
+        
+        
+        let postDate = tweet.timeStamp
+        let timeAgoDate = NSDate.shortTimeAgoSinceDate(postDate)
+        timeStampLabel.text = timeAgoDate
+        
+        retweetCountLabel.text = String(tweet.retweetCount)
+        likeCountLabel.text = String(tweet.favoritesCount)
     }
     
     override func awakeFromNib() {

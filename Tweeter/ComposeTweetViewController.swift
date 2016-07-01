@@ -16,6 +16,8 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
     @IBOutlet weak var inReplyLabel: UILabel!
     @IBOutlet weak var charactersLeftLabel: UILabel!
     
+    @IBOutlet weak var tweetButton: UIButton!
+    
     let maxCharacters: Int = 140
     
     @IBOutlet weak var optionsViewToBottomConstraint: NSLayoutConstraint!
@@ -128,6 +130,14 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
         } else {
             charactersLeftLabel.textColor = UIColor.redColor()
         }
+        
+        if (charactersLeft < 0) {
+            tweetButton.setTitleColor(UIColor.lightGrayColor(), forState: .Normal)
+            tweetButton.enabled = false
+        } else {
+            tweetButton.setTitleColor(UIColor.blueColor(), forState: .Normal)
+            tweetButton.enabled = true
+        }
     }
     
 //    func keyboardShown(notification: NSNotification) {
@@ -143,23 +153,31 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
     
     @IBAction func onTweet(sender: AnyObject) {
         if (tweetTextView.text != "") {
-            let client = TwitterClient.sharedInstance
-            if (isReply) {
-                client.postReplyTweet(tweetTextView.text, inReplyToString: inReplyTo!.id!, success: {
-                    self.dismissViewControllerAnimated(true, completion: {
-                        
-                    })
-                    }, failure: { (error: NSError) in
-                        print("error: \(error.localizedDescription)")
-                })
+            if (tweetTextView.text.characters.count > 140) {
+                let alert = UIAlertView()
+                alert.title = "Oops!"
+                alert.message = "Tweet exceeds 140-character limit"
+                alert.addButtonWithTitle("Edit Tweet")
+                alert.show()
             } else {
-                client.postTweet(tweetTextView.text, success: {
-                    self.dismissViewControllerAnimated(true, completion: {
-                        
+                let client = TwitterClient.sharedInstance
+                if (isReply) {
+                    client.postReplyTweet(tweetTextView.text, inReplyToString: inReplyTo!.id!, success: {
+                        self.dismissViewControllerAnimated(true, completion: {
+                            
+                        })
+                        }, failure: { (error: NSError) in
+                            print("error: \(error.localizedDescription)")
                     })
-                    }, failure: { (error: NSError) in
-                        print("error: \(error.localizedDescription)")
-                })
+                } else {
+                    client.postTweet(tweetTextView.text, success: {
+                        self.dismissViewControllerAnimated(true, completion: {
+                            
+                        })
+                        }, failure: { (error: NSError) in
+                            print("error: \(error.localizedDescription)")
+                    })
+                }
             }
         }
     }

@@ -18,6 +18,8 @@ class Tweet: NSObject {
     var favorited: Bool = false
     var retweeted: Bool = false
     
+    var retweetedTweet: NSDictionary? = nil
+    
     var user: User?
     
     var id: String?
@@ -41,7 +43,10 @@ class Tweet: NSObject {
         
         user = User(dictionary: (dictionary["user"] as? NSDictionary)!)
         
+        retweetedTweet = dictionary["retweeted_status"] as? NSDictionary
+        
         id = (dictionary["id_str"] as? String)
+        
     }
     
     class func tweetsWithArray(dictionaries: [NSDictionary]) -> [Tweet] {
@@ -49,6 +54,7 @@ class Tweet: NSObject {
         
         for dictionary in dictionaries {
             let tweet = Tweet(dictionary: dictionary)
+    
             tweets.append(tweet)
         }
         

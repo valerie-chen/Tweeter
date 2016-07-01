@@ -66,13 +66,13 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             // Calculate the position of one screen length before the bottom of the results
             let scrollViewContentHeight = tableView.contentSize.height
             let scrollOffsetThreshold = scrollViewContentHeight - tableView.bounds.size.height
-            
+            tweetCount += 20
             // When the user has scrolled past the threshold, start requesting
             if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.dragging) {
                 isMoreDataLoading = true
                 
                 // ... Code to load more results ...
-                tweetCount += 20
+                // tweetCount += 20
                 retrieveTimeline()
                 isMoreDataLoading = false
             }
@@ -89,7 +89,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("TweetCell", forIndexPath: indexPath) as! TweetCell
-        cell.tweet = tweets[indexPath.row]
+        let tweet = tweets[indexPath.row]
+        cell.tweet = tweet
         return cell
     }
     
