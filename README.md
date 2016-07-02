@@ -51,9 +51,7 @@ Please list two areas of the assignment you'd like to **discuss further with you
 
 Here's a walkthrough of implemented user stories:
 
-Cannot create demo right now because of Twitter 429 error — will update ASAP!
-
-GIF created with [LiceCap](http://www.cockos.com/licecap/).
+[Youtube Video Walkthrough](https://www.youtube.com/watch?v=2-ZqrY4NI4E&feature=youtu.be)
 
 ## Notes
 
@@ -64,7 +62,7 @@ I wanted a TweetCell object in multiple different view controllers, formatted th
 List an 3rd party libraries, icons, graphics, or other assets you used in your app.
 
 - [AFNetworking](https://github.com/AFNetworking/AFNetworking) - networking task library
-- DateTools
+- [DateTools](https://github.com/MatthewYork/DateTools)
 - BDBOAuth1Manager
 
 ## License
