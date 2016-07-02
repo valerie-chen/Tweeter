@@ -74,6 +74,8 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
             print("not a reply\n")
         }
         
+        tweetTextView.becomeFirstResponder()
+        
     }
     
     func textViewDidBeginEditing(textView: UITextView) {
@@ -183,6 +185,7 @@ class ComposeTweetViewController: UIViewController, UITextViewDelegate {
     }
     
     @IBAction func onCancel(sender: AnyObject) {
+        tweetTextView.resignFirstResponder()
         self.dismissViewControllerAnimated(true) {
         }
     }

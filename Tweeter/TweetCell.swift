@@ -24,50 +24,13 @@ class TweetCell: UITableViewCell {
     @IBOutlet weak var retweetCountLabel: UILabel!
     @IBOutlet weak var likeCountLabel: UILabel!
     
-    @IBOutlet weak var retweetedView: UIImageView!
-    @IBOutlet weak var retweetedLabel: UILabel!
-    
-    var retweetedOf: NSDictionary?
-    
-    @IBOutlet weak var retweetedLabelHeight: NSLayoutConstraint!
-    @IBOutlet weak var retweetedViewHeight: NSLayoutConstraint!
-    
-    @IBOutlet weak var nameLabelTop: NSLayoutConstraint!
+    // var retweetedOf: NSDictionary?
     
     let client = TwitterClient.sharedInstance
     
     var tweet: Tweet! {
         didSet {
-            retweetedOf = tweet.retweetedTweet
-            if retweetedOf == nil {
-                formatCell(tweet)
-                profileImageView.frame = CGRectMake(profileImageView.frame.origin.x, profileImageView.frame.origin.y - 8, profileImageView.frame.width, profileImageView.frame.height)
-                retweetedLabel.hidden = true
-                retweetedView.hidden = true
-//                retweetedLabelHeight = NSLayoutConstraint(item: retweetedLabel, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 0.0)
-//                retweetedViewHeight = NSLayoutConstraint(item: retweetedView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 0.0)
-//                
-//                NSLayoutConstraint.activateConstraints([retweetedLabelHeight!, retweetedViewHeight!])
-//                retweetedView.frame.size = CGSize(width: 0.0, height: 0.0)
-//                retweetedLabel.frame.size = CGSize(width: 0.0, height: 0.0)
-//                print(String(retweetedView.frame.height))
-//                retweetedViewHeight.active = false
-//                retweetedView.translatesAutoresizingMaskIntoConstraints = true
-//                retweetedLabel.translatesAutoresizingMaskIntoConstraints = true
-//                retweetedView.frame = CGRectMake(retweetedView.frame.origin.x, retweetedView.frame.origin.y, /*retweetedView.frame.width*/ 0.0, 0.0)
-//                retweetedLabel.frame = CGRectMake(retweetedLabel.frame.origin.x, retweetedLabel.frame.origin.y, /*retweetedLabel.frame.width*/ 0.0, 0.0)
-                
-            } else {
-                
-                let newTweet = Tweet(dictionary: retweetedOf!)
-                formatCell(newTweet)
-//                retweetedViewHeight.active = true
-//                retweetedLabel.text = "\(tweet!.user!.name!) Retweeted"
-//                retweetedLabelHeight = NSLayoutConstraint(item: retweetedLabel, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 15.5)
-//                retweetedViewHeight = NSLayoutConstraint(item: retweetedView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 15.5)
-//                
-//                NSLayoutConstraint.activateConstraints([retweetedLabelHeight!, retweetedViewHeight!])
-            }
+            formatCell(tweet)
         }
     }
     

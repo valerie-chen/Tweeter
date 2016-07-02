@@ -86,6 +86,37 @@ class TwitterClient: BDBOAuth1SessionManager {
         }
     }
     
+    func searchAllPosts(search: String, success: ([Tweet]) -> (), failure: (NSError) -> ()) {
+        GET("1.1/search/tweets.json", parameters: ["q": search], progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
+            // print(response!)
+            let dictionaries = response!["statuses"] as! [NSDictionary]
+            let tweets = Tweet.tweetsWithArray(dictionaries)
+            
+            success(tweets)
+            
+        }) { (task: NSURLSessionDataTask?, error: NSError) in
+            failure(error)
+        }
+    }
+    
+    func searchPopularPosts(search: String, success: ([Tweet]) -> (), failure: (NSError) -> ()) {
+        GET("1.1/search/tweets.json", parameters: ["q": search, "result_type": "popular"], progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
+//            let response = response as! NSArray
+//            var dictionaries: [NSDictionary] = []
+//            for dictionary in response {
+//                dictionaries.append(dictionary as! NSDictionary)
+//            }
+            let dictionaries = response!["statuses"] as! [NSDictionary]
+            let tweets = Tweet.tweetsWithArray(dictionaries)
+            
+            success(tweets)
+            
+        }) { (task: NSURLSessionDataTask?, error: NSError) in
+            failure(error)
+        }
+        
+    }
+    
     func currentAccount(success: (User) -> (), failure: (NSError) -> ()) {
         GET("1.1/account/verify_credentials.json", parameters: nil, progress: nil, success: { (task: NSURLSessionDataTask, response: AnyObject?) in
             
