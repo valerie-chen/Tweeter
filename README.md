@@ -2,7 +2,7 @@
 
 Tweeter is a basic twitter app to read and compose tweets the [Twitter API](https://apps.twitter.com/).
 
-Time spent: **24** hours spent in total
+Time spent: **38** hours spent in total
 
 ## User Stories
 
@@ -38,12 +38,14 @@ The following **optional** features are implemented:
 
 The following **additional** features are implemented:
 
-- [ ] List anything else that you can get done to improve the app functionality!
+- [X] Compose button disabled if tweet text is not valid (i.e. >140 characters)
+- [X] User can search Twitter for posts relevant to search query, and toggle between popular and all (recent) posts that match the query.
+- [X] Twitter logo on splash screen
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
-1.
-2.
+1. Using delegates — there were instances where doing that would have been helpful, but I wasn't confident that I could efficiently implement it
+2. Using notifications ^
 
 ## Video Walkthrough
 
@@ -55,7 +57,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+I wanted a TweetCell object in multiple different view controllers, formatted the exact same way. So I ended up control-dragging the subviews of the cell directly into a new view controller—which caused many problems, as expected. Is there another shortcut (as opposed to just creating and formatting views all over again) that is secure?
 
 ## Credits
 
@@ -63,6 +65,7 @@ List an 3rd party libraries, icons, graphics, or other assets you used in your a
 
 - [AFNetworking](https://github.com/AFNetworking/AFNetworking) - networking task library
 - DateTools
+- BDBOAuth1Manager
 
 ## License
 
